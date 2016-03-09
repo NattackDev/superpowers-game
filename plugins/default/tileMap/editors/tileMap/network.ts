@@ -40,44 +40,6 @@ function onConnected() {
   data.tileMapUpdater = new TileMapRendererUpdater(data.projectClient, tileMapRenderer, config, subscribers);
 }
 
-// Tile Map
-function onTileMapAssetReceived() {
-  const pub = data.tileMapUpdater.tileMapAsset.pub;
-
-  const tileSetActor = new SupEngine.Actor(tileSetArea.gameInstance, "Tile Set");
-  const tileSetRenderer = new TileSetRenderer(tileSetActor);
-  const config = { tileSetAssetId: pub.tileSetId };
-
-  const subscriber: SupClient.AssetSubscriber = {
-    onAssetReceived: onTileSetAssetReceived,
-    onAssetEdited: (assetId, command, ...args) => { if (onTileSetEditCommands[command] != null) onTileSetEditCommands[command](...args); }
-  };
-  data.tileSetUpdater = new TileSetRendererUpdater(data.projectClient, tileSetRenderer, config, subscriber);
-
-  updateTileSetInput();
-  onEditCommands["resizeMap"]();
-
-  for (const setting in ui.settings) setProperty(setting, (pub as any)[setting]);
-  for (let index = pub.layers.length - 1; index >= 0; index--) setupLayer(pub.layers[index], index);
-
-  tileSetArea.selectedLayerId = pub.layers[0].id.toString();
-  ui.layersTreeView.addToSelection(ui.layersTreeView.treeRoot.querySelector(`li[data-id="${pub.layers[0].id}"]`) as HTMLLIElement);
-  mapArea.patternActor.setLocalPosition(new SupEngine.THREE.Vector3(0, 0, pub.layerDepthOffset / 2));
-}
-
-function updateTileSetInput() {
-  let tileSetName =
-    (data.tileMapUpdater.tileMapAsset.pub.tileSetId != null) ?
-      data.projectClient.entries.getPathFromId(data.tileMapUpdater.tileMapAsset.pub.tileSetId) : "";
-  ui.tileSetInput.value = tileSetName;
-  ui.openTileSetButton.disabled = data.tileMapUpdater.tileMapAsset.pub.tileSetId == null;
-}
-
-onEditCommands["changeTileSet"] = () => {
-  updateTileSetInput();
-  data.tileSetUpdater.changeTileSetId(data.tileMapUpdater.tileMapAsset.pub.tileSetId);
-};
-
 onEditCommands["resizeMap"] = () => {
   let width = data.tileMapUpdater.tileMapAsset.pub.width;
   let height = data.tileMapUpdater.tileMapAsset.pub.height;
@@ -146,6 +108,45 @@ onEditCommands["moveLayer"] = (id: string, newIndex: number) => {
 
   refreshLayersId();
 };
+
+// Tile Map
+function onTileMapAssetReceived() {
+  const pub = data.tileMapUpdater.tileMapAsset.pub;
+
+  const tileSetActor = new SupEngine.Actor(tileSetArea.gameInstance, "Tile Set");
+  const tileSetRenderer = new TileSetRenderer(tileSetActor);
+  const config = { tileSetAssetId: pub.tileSetId };
+
+  const subscriber: SupClient.AssetSubscriber = {
+    onAssetReceived: onTileSetAssetReceived,
+    onAssetEdited: (assetId, command, ...args) => { if (onTileSetEditCommands[command] != null) onTileSetEditCommands[command](...args); }
+  };
+  data.tileSetUpdater = new TileSetRendererUpdater(data.projectClient, tileSetRenderer, config, subscriber);
+
+  updateTileSetInput();
+  onEditCommands["resizeMap"]();
+
+  for (const setting in ui.settings) setProperty(setting, (pub as any)[setting]);
+  for (let index = pub.layers.length - 1; index >= 0; index--) setupLayer(pub.layers[index], index);
+
+  tileSetArea.selectedLayerId = pub.layers[0].id.toString();
+  ui.layersTreeView.addToSelection(ui.layersTreeView.treeRoot.querySelector(`li[data-id="${pub.layers[0].id}"]`) as HTMLLIElement);
+  mapArea.patternActor.setLocalPosition(new SupEngine.THREE.Vector3(0, 0, pub.layerDepthOffset / 2));
+}
+
+function updateTileSetInput() {
+  let tileSetName =
+    (data.tileMapUpdater.tileMapAsset.pub.tileSetId != null) ?
+      data.projectClient.entries.getPathFromId(data.tileMapUpdater.tileMapAsset.pub.tileSetId) : "";
+  ui.tileSetInput.value = tileSetName;
+  ui.openTileSetButton.disabled = data.tileMapUpdater.tileMapAsset.pub.tileSetId == null;
+}
+
+onEditCommands["changeTileSet"] = () => {
+  updateTileSetInput();
+  data.tileSetUpdater.changeTileSetId(data.tileMapUpdater.tileMapAsset.pub.tileSetId);
+};
+
 
 // Tile Set
 function onTileSetAssetReceived() {
