@@ -147,21 +147,6 @@ onEditCommands["moveLayer"] = (id: string, newIndex: number) => {
   refreshLayersId();
 };
 
-// Tile Set
-function onTileSetAssetReceived() {
-  let tileMapPub = data.tileMapUpdater.tileMapAsset.pub;
-  let tileSetPub = data.tileMapUpdater.tileSetAsset.pub;
-
-  mapArea.cameraControls.setMultiplier(tileMapPub.pixelsPerUnit / tileSetPub.grid.width / 1);
-  mapArea.gridRenderer.setRatio({ x: tileMapPub.pixelsPerUnit / tileSetPub.grid.width, y: tileMapPub.pixelsPerUnit / tileSetPub.grid.height });
-
-  if (tileSetPub.texture != null) {
-    mapArea.patternRenderer.setTileSet(new TileSet(tileSetPub));
-    if (ui.brushToolButton.checked) selectBrushTool(0, 0);
-  }
-  mapArea.patternBackgroundRenderer.setup(0x900090, 1 / tileMapPub.pixelsPerUnit, tileSetPub.grid.width);
-};
-
 onTileSetEditCommands["upload"] = () => {
   mapArea.patternRenderer.setTileSet(new TileSet(data.tileMapUpdater.tileSetAsset.pub));
   if (ui.brushToolButton.checked) selectBrushTool(0, 0);
@@ -177,4 +162,19 @@ onTileSetEditCommands["setProperty"] = () => {
   mapArea.patternBackgroundRenderer.setup(0x900090, 1 / tileMapPub.pixelsPerUnit, tileSetPub.grid.width);
 
   if (ui.brushToolButton.checked) selectBrushTool(0, 0);
+};
+
+// Tile Set
+function onTileSetAssetReceived() {
+  let tileMapPub = data.tileMapUpdater.tileMapAsset.pub;
+  let tileSetPub = data.tileMapUpdater.tileSetAsset.pub;
+
+  mapArea.cameraControls.setMultiplier(tileMapPub.pixelsPerUnit / tileSetPub.grid.width / 1);
+  mapArea.gridRenderer.setRatio({ x: tileMapPub.pixelsPerUnit / tileSetPub.grid.width, y: tileMapPub.pixelsPerUnit / tileSetPub.grid.height });
+
+  if (tileSetPub.texture != null) {
+    mapArea.patternRenderer.setTileSet(new TileSet(tileSetPub));
+    if (ui.brushToolButton.checked) selectBrushTool(0, 0);
+  }
+  mapArea.patternBackgroundRenderer.setup(0x900090, 1 / tileMapPub.pixelsPerUnit, tileSetPub.grid.width);
 };
